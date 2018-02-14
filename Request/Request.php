@@ -127,16 +127,11 @@ abstract class Request {
         $client = new \GuzzleHttp\Client();
 
         $uri = $this->url;
-        $options = $this->prepareDefaults($options);
         // Remove request modifying parameter because it can be done up-front.
         $headers = isset($options['headers']) ? $options['headers'] : [];
         $body = isset($options['body']) ? $options['body'] : null;
         $version = isset($options['version']) ? $options['version'] : '1.1';
-        // Merge the URI into the base URI.
-        $uri = $this->buildUri($uri, $options);
-        if (is_array($body)) {
-            $this->invalidBody();
-        }
+
         $this->request = new \GuzzleHttp\Psr7\Request('get', $uri, $headers, $body, $version);
         // Remove the option so that they are not doubly-applied.
         unset($options['headers'], $options['body'], $options['version']);
