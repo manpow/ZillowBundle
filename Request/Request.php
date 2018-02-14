@@ -14,6 +14,8 @@ namespace KMJ\ZillowBundle\Request;
  * @author Kaelin Jacobson <kaelinjacobson@gmail.com>
  */
 abstract class Request {
+    /** @var \GuzzleHttp\Psr7\Request */
+    protected $request;
 
     /**
      * The number of seconds the cache should be valid
@@ -59,6 +61,14 @@ abstract class Request {
     }
 
     /**
+     * @return \GuzzleHttp\Psr7\Stream|\Psr\Http\Message\StreamInterface
+     */
+    public function getPayload()
+    {
+        return $this->request->getBody();
+    }
+
+    /**
      * Performs the request. This function serializes the current class and converts
      * it into name-value pairs in an array. Then creates a Guzzle client and sends the
      * request. Finally the returned string is converted into an SimpleXML object
@@ -88,12 +98,7 @@ abstract class Request {
         }
 
         if ($cacheXml === null) {
-            $client = new \GuzzleHttp\Client();
-
-            $response = $client->get($this->url, array(
-                "query" => $params,
-            ));
-            
+            $response = $this->send();
             $content = $response->getBody()->getContents();
 
             $xml = simplexml_load_string($content);
@@ -109,6 +114,32 @@ abstract class Request {
         $this->checkError($xml);
 
         return $this->handleResponse($xml);
+    }
+
+    /**
+     * @param array $options
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function send(array $options)
+    {
+        $client = new \GuzzleHttp\Client();
+
+        $uri = $this->url;
+        $options = $this->prepareDefaults($options);
+        // Remove request modifying parameter because it can be done up-front.
+        $headers = isset($options['headers']) ? $options['headers'] : [];
+        $body = isset($options['body']) ? $options['body'] : null;
+        $version = isset($options['version']) ? $options['version'] : '1.1';
+        // Merge the URI into the base URI.
+        $uri = $this->buildUri($uri, $options);
+        if (is_array($body)) {
+            $this->invalidBody();
+        }
+        $this->request = new \GuzzleHttp\Psr7\Request('get', $uri, $headers, $body, $version);
+        // Remove the option so that they are not doubly-applied.
+        unset($options['headers'], $options['body'], $options['version']);
+
+        return $client->send($this->request, $options);
     }
 
     /**

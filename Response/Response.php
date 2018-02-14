@@ -34,12 +34,18 @@ class Response implements XmlMapper {
     protected $limitWarning;
 
     /**
+     * @var string
+     */
+    protected $payload;
+
+    /**
      * Initializes the class and loads the XML element into it
      *
      * @param SimpleXMLElement $xml The XML to load
      */
     public function __construct(SimpleXMLElement $xml) {
         $this->load($xml);
+        $this->payload = $xml->asXML();
     }
 
     /**
@@ -49,6 +55,14 @@ class Response implements XmlMapper {
      */
     public function getZpid() {
         return $this->zpid;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPayload()
+    {
+        return $this->payload;
     }
 
     /**
