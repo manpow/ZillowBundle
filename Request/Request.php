@@ -98,7 +98,9 @@ abstract class Request {
         }
 
         if ($cacheXml === null) {
-            $response = $this->send();
+            $response = $this->send(array(
+                "query" => $params,
+            ));
             $content = $response->getBody()->getContents();
 
             $xml = simplexml_load_string($content);
