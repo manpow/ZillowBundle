@@ -10,7 +10,7 @@ namespace KMJ\ZillowBundle\Response;
 
 use KMJ\ZillowBundle\Type\AdvancedProperty;
 use KMJ\ZillowBundle\Type\Comparables;
-use Symfony\Component\HttpFoundation\Response;
+use SimpleXMLElement;
 
 /**
  * The GetDeepComps API returns a list of comparable recent sales for a 
@@ -43,9 +43,10 @@ class DeepCompsResponse extends Response {
      *
      * @param SimpleXMLElement $xml The XML to load
      */
-    public function __construct(\SimpleXMLElement $xml) {
+    public function __construct(SimpleXMLElement $xml) {
         $this->principal = new AdvancedProperty();
         $this->comparables = new Comparables();
+
         parent::__construct($xml);
     }
 
@@ -63,5 +64,43 @@ class DeepCompsResponse extends Response {
                 return (string) $value;
         }
     }
+
+    /**
+     * @return AdvancedProperty
+     */
+    public function getPrincipal(): AdvancedProperty
+    {
+        return $this->principal;
+    }
+
+    /**
+     * @param AdvancedProperty $principal
+     * @return DeepCompsResponse
+     */
+    public function setPrincipal(AdvancedProperty $principal): DeepCompsResponse
+    {
+        $this->principal = $principal;
+        return $this;
+    }
+
+    /**
+     * @return Comparables
+     */
+    public function getComparables(): Comparables
+    {
+        return $this->comparables;
+    }
+
+    /**
+     * @param Comparables $comparables
+     * @return DeepCompsResponse
+     */
+    public function setComparables(Comparables $comparables): DeepCompsResponse
+    {
+        $this->comparables = $comparables;
+        return $this;
+    }
+
+
 
 }
