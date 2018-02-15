@@ -43,7 +43,7 @@ class DeepCompsResponse extends Response {
      *
      * @param SimpleXMLElement $xml The XML to load
      */
-    public function __construct(SimpleXMLElement $xml) {
+    public function __construct(\SimpleXMLElement $xml) {
         $this->principal = new AdvancedProperty();
         $this->comparables = new Comparables();
         parent::__construct($xml);
